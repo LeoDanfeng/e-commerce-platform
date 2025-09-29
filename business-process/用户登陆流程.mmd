@@ -1,0 +1,14 @@
+sequenceDiagram
+participant Client as 客户端
+participant Gateway as 网关服务
+participant User as 用户服务
+participant DB as 用户数据库
+
+    Client->>Gateway: POST /user/api/auth/login
+    Gateway->>User: 转发登录请求
+    User->>DB: 查询用户信息
+    DB-->>User: 返回用户数据
+    User->>User: 验证密码
+    User->>User: 生成Token
+    User-->>Gateway: 返回登录响应(token+用户信息)
+    Gateway-->>Client: 返回登录结

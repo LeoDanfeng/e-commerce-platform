@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant Client as 客户端
+    participant Gateway as 网关服务
+    participant Order as 订单服务
+    participant Product as 商品服务
+    participant DB as 数据库
+
+    Client->>Gateway: POST /order/api/orders
+    Gateway->>Order: 转发创建订单请求
+    Order->>Order: 验证订单项
+    loop 验证每个商品
+        Order->>Product: 通过Feign调用获取商品信息
+        Product->>DB: 查询商品详情
+        DB-->>Product: 返回商品数据
+        Product-->>Order: 返回商品DTO
+        Order->>Order: 验证库存
+    end
+    Order->>DB: 保存订单和订单项
+    DB-->>Order: 保存成功
+    Order->>Order: 计算总金额
+    Order-->>Gateway: 返回订单数据
+    Gateway-->>Client: 返回订单信息

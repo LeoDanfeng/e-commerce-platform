@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Client as 客户端
+    participant Gateway as 网关服务
+    participant Product as 商品服务
+    participant DB as 商品数据库
+
+    Client->>Gateway: GET /product/api/products
+    Gateway->>Product: 转发商品查询请求
+    Product->>DB: 查询商品数据
+    DB-->>Product: 返回商品列表
+    Product->>Product: 转换为DTO
+    Product-->>Gateway: 返回商品数据
+    Gateway-->>Client: 返回商品列表

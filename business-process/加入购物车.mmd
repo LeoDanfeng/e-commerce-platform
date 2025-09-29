@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client as 客户端
+    participant Gateway as 网关服务
+    participant Cart as 购物车服务
+    participant Product as 商品服务
+    participant DB as 数据库
+
+    Client->>Gateway: POST /cart/api/cart/add
+    Gateway->>Cart: 转发加入购物车请求
+    Cart->>Product: 通过Feign调用获取商品信息
+    Product->>DB: 查询商品详情
+    DB-->>Product: 返回商品数据
+    Product-->>Cart: 返回商品DTO
+    Cart->>Cart: 验证库存
+    Cart->>DB: 保存购物车项
+    DB-->>Cart: 保存成功
+    Cart-->>Gateway: 返回购物车数据
+    Gateway-->>Client: 返回操作结果

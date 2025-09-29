@@ -1,0 +1,16 @@
+// CartApplication.java
+package com.self.appreciation.cart;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients(basePackages = "com.self.appreciation.cart.client")
+public class CartApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(CartApplication.class, args);
+    }
+}

@@ -1,0 +1,391 @@
+# k8s/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: e-commerce-platform
+---
+# k8s/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: e-commerce-config
+  namespace: e-commerce-platform
+data:
+  MYSQL_HOST: "mysql-service"
+  NACOS_HOST: "nacos-service"
+  NACOS_PORT: "8848"
+---
+# k8s/mysql-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: e-commerce-platform
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "MysqlRootPassword"
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-storage
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: e-commerce-platform
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP
+---
+# k8s/nacos-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nacos
+  namespace: e-commerce-platform
+  labels:
+    app: nacos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nacos
+  template:
+    metadata:
+      labels:
+        app: nacos
+    spec:
+      containers:
+        - name: nacos
+          image: nacos/nacos-server:v2.1.0
+          ports:
+            - containerPort: 8848
+          env:
+            - name: MODE
+              value: "standalone"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nacos-service
+  namespace: e-commerce-platform
+spec:
+  selector:
+    app: nacos
+  ports:
+    - name: http
+      port: 8848
+      targetPort: 8848
+    - name: grpc  # 新增gRPC端口
+      port: 9848
+      targetPort: 9848
+  type: ClusterIP
+---
+# k8s/gateway-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service
+  namespace: e-commerce-platform
+  labels:
+    app: gateway-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-service
+  template:
+    metadata:
+      labels:
+        app: gateway-service
+    spec:
+      imagePullSecrets:
+        - name: harbor-secret
+      containers:
+        - name: gateway-service
+          image: harbor.laria.cn/default/gateway:1.0-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: e-commerce-config
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+  namespace: e-commerce-platform
+spec:
+  selector:
+    app: gateway-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+---
+# k8s/user-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: e-commerce-platform
+  labels:
+    app: user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      imagePullSecrets:
+        - name: harbor-secret
+      containers:
+        - name: user-service
+          image: harbor.laria.cn/default/user:1.0-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: e-commerce-config
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: e-commerce-platform
+spec:
+  selector:
+    app: user-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+# k8s/product-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+  namespace: e-commerce-platform
+  labels:
+    app: product-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      imagePullSecrets:
+        - name: harbor-secret
+      containers:
+        - name: product-service
+          image: harbor.laria.cn/default/product:1.0-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: e-commerce-config
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service
+  namespace: e-commerce-platform
+spec:
+  selector:
+    app: product-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+# k8s/order-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: e-commerce-platform
+  labels:
+    app: order-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      imagePullSecrets:
+        - name: harbor-secret
+      containers:
+        - name: order-service
+          image: harbor.laria.cn/default/order:1.0-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: e-commerce-config
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: e-commerce-platform
+spec:
+  selector:
+    app: order-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+# k8s/cart-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-service
+  namespace: e-commerce-platform
+  labels:
+    app: cart-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart-service
+  template:
+    metadata:
+      labels:
+        app: cart-service
+    spec:
+      imagePullSecrets:
+        - name: harbor-secret
+      containers:
+        - name: cart-service
+          image: harbor.laria.cn/default/cart:1.0-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: e-commerce-config
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-service
+  namespace: e-commerce-platform
+spec:
+  selector:
+    app: cart-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+# k8s/payment-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: e-commerce-platform
+  labels:
+    app: payment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      imagePullSecrets:
+        - name: harbor-secret
+      containers:
+        - name: payment-service
+          image: harbor.laria.cn/default/payment:1.0-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: e-commerce-config
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+          volumeMounts:
+            - name: sandbox-volume
+              mountPath: /sandbox  # 容器内挂载路径
+            # 保留其他容器配置
+          # 添加 volumes
+      volumes:
+        - name: sandbox-volume
+          configMap:
+            name: sandbox-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: e-commerce-platform
+spec:
+  selector:
+    app: payment-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP

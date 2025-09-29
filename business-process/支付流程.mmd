@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Client as 客户端
+    participant Gateway as 网关服务
+    participant Payment as 支付服务
+    participant Alipay as 支付宝
+    participant DB as 数据库
+
+    Client->>Gateway: POST /api/payments
+    Gateway->>Payment: 转发支付请求
+    Payment->>Payment: 验证支付请求参数
+    Payment->>DB: 创建支付记录(状态:PENDING)
+    DB-->>Payment: 返回支付记录
+    Payment->>Payment: 生成商户订单号
+    Payment->>Alipay: 调用统一下单接口
+    Alipay-->>Payment: 返回支付表单
+    Payment->>DB: 更新支付信息
+    DB-->>Payment: 保存成功
+    Payment-->>Gateway: 返回支付响应
+    Gateway-->>Client: 返回支付表单
