@@ -1,5 +1,18 @@
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.web: DEBUG
+    org.springframework.security.oauth2: TRACE
+    org.springframework.web.server.session: DEBUG
+
 spring:
   application:
     name: product-service
   profiles:
     active: dev
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8081/oauth2/jwks

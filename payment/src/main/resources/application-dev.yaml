@@ -27,6 +27,12 @@ spring:
         username: nacos
         password: nacos
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8081/oauth2/jwks
+
 alipay:
   app-id: 9021000142686486
   private-key: "D:/sandbox/app_private_key.txt"

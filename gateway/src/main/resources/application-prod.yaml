@@ -2,6 +2,31 @@ server:
   port: 8080
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://user-service/oauth2/jwks
+      client:
+        registration:
+          login-client:
+            provider: spring
+            client-id: login-client
+            client-secret: openid-connect
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri: http://gateway-service/login/oauth2/code/login-client
+            scope:
+              - openid
+              - profile
+              - message:read
+              - message:write
+            client-name: Spring
+        provider:
+          spring:
+            authorization-uri: http://user-service/oauth2/authorize
+            token-uri: http://user-service/oauth2/token
+            jwk-set-uri: http://user-service/oauth2/jwks
   cloud:
     gateway:
       discovery:

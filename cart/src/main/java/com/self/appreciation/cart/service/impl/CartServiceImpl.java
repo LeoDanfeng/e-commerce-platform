@@ -9,7 +9,7 @@ import com.self.appreciation.cart.service.CartService;
 import com.self.appreciation.cart.dto.AddToCartRequest;
 import com.self.appreciation.cart.dto.CartDTO;
 import com.self.appreciation.cart.dto.CartItemDTO;
-import com.self.appreciation.cart.client.ProductServiceClient;
+import com.self.appreciation.cart.api.ProductServiceClient;
 import com.self.appreciation.cart.dto.ProductDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;

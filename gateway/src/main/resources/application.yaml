@@ -1,8 +1,29 @@
-server:
-  port: 8080
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.web: DEBUG
+    org.springframework.security.oauth2: TRACE
+    org.springframework.web.server.session: DEBUG
 
 spring:
   application:
     name: gateway-service
   profiles:
     active: dev
+
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns:
+              - "http://localhost:*"
+              - "http://192.168*.com"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allow-credentials:  true
+            allowed-headers:
+              - "*"

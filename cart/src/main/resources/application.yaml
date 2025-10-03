@@ -3,3 +3,4 @@ spring:
     name: cart-service
   profiles:
     active: dev
+

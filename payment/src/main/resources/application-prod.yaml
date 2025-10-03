@@ -29,6 +29,12 @@ spring:
         # 重点！添加启动延迟，等待Nacos客户端初始化完成
         register-delay: 5000   # 延迟5秒注册
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://user-service/oauth2/jwks
+
 alipay:
   app-id: 9021000142686486
   private-key: "/sandbox/app_private_key.txt"

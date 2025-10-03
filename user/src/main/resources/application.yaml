@@ -1,5 +1,15 @@
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.web: DEBUG
+    org.springframework.security.oauth2: TRACE
+
 spring:
   application:
     name: user-service
   profiles:
     active: dev
+
+
+
+

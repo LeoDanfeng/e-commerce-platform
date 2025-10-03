@@ -27,3 +27,9 @@ spring:
         server-addr: 192.168.0.119:8848
         username: nacos
         password: nacos
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8081/oauth2/jwks

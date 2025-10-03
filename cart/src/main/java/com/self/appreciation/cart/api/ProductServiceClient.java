@@ -1,5 +1,5 @@
 // ProductServiceClient.java
-package com.self.appreciation.cart.client;
+package com.self.appreciation.cart.api;
 
 import com.self.appreciation.cart.dto.ProductDTO;
 import org.springframework.cloud.openfeign.FeignClient;
